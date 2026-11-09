@@ -12,19 +12,7 @@
 	[self flushWindow];
 }
 
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)styleMask backing:(NSBackingStoreType)bufferingType defer:(BOOL)deferCreation
-{
-	self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:bufferingType defer:deferCreation];
-	[self setBecomesKeyOnlyIfNeeded:YES];
-	[self setLevel:NSStatusWindowLevel];
-	[self setOpaque:NO];
-	[self setCanHide:NO];
-	[self setIgnoresMouseEvents:YES];
-	[self setMovableByWindowBackground:NO];
-	[self setFrame:NSMakeRect(0.0f, 0.0f, 32.0f, 32.0f) display:0];
-	[self center];
-	[self setBackgroundColor:[NSColor clearColor]];
-	[self useOptimizedDrawing:YES];
+- (void)loadSprites {
 	NSBundle *bundle = [NSBundle mainBundle];
 	
 	stop = [NSArray arrayWithObjects:
@@ -96,10 +84,32 @@
 		[[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"rtogi1" ofType:@"gif"]],
 		[[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"rtogi2" ofType:@"gif"]], nil];
 	[r_togi retain];
-	
-	[self setStateTo:stop];
-	
+}
+
+- (void)setupTimer {
 	[NSTimer scheduledTimerWithTimeInterval:0.125f target:self selector:@selector(handleTimer:) userInfo:nil repeats:YES];
+}
+
+- (void)setupWindow {
+	[self setBecomesKeyOnlyIfNeeded:YES];
+	[self setLevel:NSStatusWindowLevel];
+	[self setOpaque:NO];
+	[self setCanHide:NO];
+	[self setIgnoresMouseEvents:YES];
+	[self setMovableByWindowBackground:NO];
+	[self setFrame:NSMakeRect(0.0f, 0.0f, 32.0f, 32.0f) display:0];
+	[self center];
+	[self setBackgroundColor:[NSColor clearColor]];
+	[self useOptimizedDrawing:YES];
+}
+
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)styleMask backing:(NSBackingStoreType)bufferingType defer:(BOOL)deferCreation
+{
+	self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:bufferingType defer:deferCreation];
+	[self setupWindow];
+	[self loadSprites];
+	[self setStateTo:stop];
+	[self setupTimer];
 	return self;
 }
 
@@ -108,16 +118,16 @@
 	float		MouseX, MouseY;
 	float		DeltaX, DeltaY;
 	float		Length;
-	
+
 	NSPoint p = [NSEvent mouseLocation];
 	MouseX = p.x;
 	MouseY = p.y;
-	
+
 	DeltaX = floor(MouseX - x - 16.0f);
 	DeltaY = floor(MouseY - y);
-	
+
 	Length = hypotf(DeltaX, DeltaY);
-	
+
 	if (Length != 0.0f) {
 		if (Length <= 13.0f) {
 			moveDx = DeltaX;
@@ -155,7 +165,7 @@
     double		LargeX, LargeY;
     double		Length;
     double		SinTheta;
-	
+
     if (moveDx == 0.0f && moveDy == 0.0f) {
 		NewState = stop;
     } else {
@@ -164,7 +174,7 @@
 		Length = sqrt(LargeX * LargeX + LargeY * LargeY);
 		SinTheta = LargeY / Length;
 		//printf("SinTheta = %f\n", SinTheta);
-		
+
 		if (moveDx > 0) {
 			if (SinTheta > 0.9239) {
 				NewState = u_move;
@@ -191,7 +201,7 @@
 			}
 		}
     }
-	
+
     [self setStateTo:NewState];
 }
 
@@ -203,8 +213,8 @@
 	
 	[self calcDxDyForX:x Y:y];
 	BOOL isNekoMoveStart = [self isNekoMoveStart];
-	
-    if(nekoState != sleep) {
+
+	if(nekoState != sleep) {
 		[view setImageTo:(NSImage*)[nekoState objectAtIndex:tickCount % [nekoState count]]];
     } else {
 		[view setImageTo:(NSImage*)[nekoState objectAtIndex:(tickCount>>2) % [nekoState count]]];
