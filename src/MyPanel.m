@@ -1,5 +1,11 @@
 #import "MyPanel.h"
 
+/* stateCount advances every 0.25s (4 per second) and saturates at 255 (~63s) */
+#define SIT_MIN_STATE_COUNT 12		/* ~3s */
+#define SCRATCH_MIN_STATE_COUNT 4	/* ~1s */
+#define NAP_MIN_STATE_COUNT 240		/* ~60s */
+#define IDLE_ROUNDS 3			/* play/scratch rounds before yawning */
+
 @implementation MyPanel
 - (void)setStateTo:(id)theState
 {
@@ -22,6 +28,9 @@
 		[[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"jare2" ofType:@"gif"]],
 		[[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"mati2" ofType:@"gif"]], nil];
 	[jare retain];
+	mati = [NSArray arrayWithObjects:
+		[[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"mati2" ofType:@"gif"]], nil];
+	[mati retain];
 	kaki = [NSArray arrayWithObjects:
 		[[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"kaki1" ofType:@"gif"]],
 		[[NSImage alloc] initWithContentsOfFile:[bundle pathForResource:@"kaki2" ofType:@"gif"]], nil];
@@ -239,6 +248,7 @@
 		} else if (moveDy > 0 && y >= WindowHeight - 32) {
 			[self setStateTo:d_togi];
 		} else {*/
+		idleRounds = 0;
 		[self setStateTo:jare];
 		//}
 	} else if(nekoState == jare) {
@@ -249,16 +259,29 @@
 		if (stateCount < 10) {
 			goto breakout;
 		}
-		[self setStateTo:kaki];
-	} else if(nekoState == kaki) {
+		[self setStateTo:mati];
+	} else if(nekoState == mati) {
 		if (isNekoMoveStart) {
 			[self setStateTo:awake];
 			goto breakout;
 		}
-		if (stateCount < 4) {
+		if (stateCount < SIT_MIN_STATE_COUNT) {
 			goto breakout;
 		}
-		[self setStateTo:akubi];
+		[self setStateTo:kaki];
+	} else if(nekoState == kaki) {
+		if (isNekoMoveStart && stateCount >= SCRATCH_MIN_STATE_COUNT) {
+			[self setStateTo:awake];
+			goto breakout;
+		}
+		if (stateCount < SCRATCH_MIN_STATE_COUNT) {
+			goto breakout;
+		}
+		if (++idleRounds < IDLE_ROUNDS) {
+			[self setStateTo:jare];
+		} else {
+			[self setStateTo:akubi];
+		}
 	} else if(nekoState == akubi) {
 		if (isNekoMoveStart) {
 			[self setStateTo:awake];
@@ -269,7 +292,7 @@
 		}
 		[self setStateTo:sleep];
 	} else if(nekoState == sleep) {
-		if (isNekoMoveStart) {
+		if (isNekoMoveStart && stateCount >= NAP_MIN_STATE_COUNT) {
 			[self setStateTo:awake];
 			goto breakout;
 		}
