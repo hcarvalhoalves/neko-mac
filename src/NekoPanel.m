@@ -1,4 +1,4 @@
-#import "MyPanel.h"
+#import "NekoPanel.h"
 
 /* stateCount advances every 0.25s (4 per second) and saturates at 255 (~63s) */
 #define SIT_MIN_STATE_COUNT 12		/* ~3s */
@@ -6,7 +6,7 @@
 #define NAP_MIN_STATE_COUNT 240		/* ~60s */
 #define IDLE_ROUNDS 3			/* play/scratch rounds before yawning */
 
-@implementation MyPanel
+@implementation NekoPanel
 - (void)setStateTo:(id)theState
 {
 	if(nekoState == theState)
@@ -15,7 +15,6 @@
 	tickCount = 0;
 	stateCount = 0;
 	nekoState = theState;
-	[self flushWindow];
 }
 
 - (void)loadSprites {
@@ -104,17 +103,20 @@
 	[self setLevel:NSStatusWindowLevel];
 	[self setOpaque:NO];
 	[self setCanHide:NO];
+	[self setHidesOnDeactivate:NO];
 	[self setIgnoresMouseEvents:YES];
 	[self setMovableByWindowBackground:NO];
 	[self setFrame:NSMakeRect(0.0f, 0.0f, 32.0f, 32.0f) display:0];
+	view = [[NekoView alloc] initWithFrame:NSMakeRect(0.0f, 0.0f, 32.0f, 32.0f)];
+	[self setContentView:view];
+	[view release];
 	[self center];
 	[self setBackgroundColor:[NSColor clearColor]];
-	[self useOptimizedDrawing:YES];
 }
 
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)styleMask backing:(NSBackingStoreType)bufferingType defer:(BOOL)deferCreation
 {
-	self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:bufferingType defer:deferCreation];
+	self = [super initWithContentRect:contentRect styleMask:NSWindowStyleMaskBorderless backing:bufferingType defer:deferCreation];
 	[self setupWindow];
 	[self loadSprites];
 	[self setStateTo:stop];

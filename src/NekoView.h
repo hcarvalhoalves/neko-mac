@@ -1,8 +1,8 @@
-/* MyView */
+/* NekoView */
 
 #import <Cocoa/Cocoa.h>
 
-@interface MyView : NSView
+@interface NekoView : NSView
 {
 	NSImage *image;
 }

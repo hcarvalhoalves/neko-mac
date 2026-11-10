@@ -8,3 +8,18 @@ different themes. This is based off the public domain Oneko code.
 This program does not show up in the dock. To close it, you either need to open
 the terminal and type `killall Neko` or open the Activity Monitor and quit
 Neko.
+
+## Building
+
+Requires macOS 11 or later and the Xcode command line tools
+(`xcode-select --install`).
+
+    make            # build and sign build/Neko.app
+    make run        # build and launch it
+    make install    # build, copy to ~/Applications and (re)launch
+    make clean
+
+`make` signs with the maintainer's Developer ID. Without that key, use an
+ad-hoc signature instead:
+
+    make IDENTITY=-

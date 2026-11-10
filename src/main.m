@@ -7,8 +7,18 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "NekoPanel.h"
 
 int main(int argc, char *argv[])
 {
-	return NSApplicationMain(argc,  (const char **) argv);
+	@autoreleasepool {
+		NSApplication *app = [NSApplication sharedApplication];
+		NekoPanel *panel = [[NekoPanel alloc] initWithContentRect:NSMakeRect(0.0f, 0.0f, 32.0f, 32.0f)
+		                                                styleMask:NSWindowStyleMaskBorderless
+		                                                  backing:NSBackingStoreBuffered
+		                                                    defer:NO];
+		[panel orderFrontRegardless];
+		[app run];
+	}
+	return 0;
 }

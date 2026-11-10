@@ -1,6 +1,6 @@
-#import "MyView.h"
+#import "NekoView.h"
 
-@implementation MyView
+@implementation NekoView
 
 - (id)initWithFrame:(NSRect)frameRect
 {
@@ -27,7 +27,7 @@
 {
     if(image) {
         [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationNone];
-		[image drawAtPoint:NSMakePoint(0.0f, 0.0f) fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
+		[image drawAtPoint:NSMakePoint(0.0f, 0.0f) fromRect:NSZeroRect operation:NSCompositingOperationCopy fraction:1.0f];
     }
 	//printf("draw %d\n", image);
 }

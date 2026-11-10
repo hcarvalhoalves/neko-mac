@@ -1,11 +1,11 @@
-/* MyPanel */
+/* NekoPanel */
 
 #import <Cocoa/Cocoa.h>
-#import "MyView.h"
+#import "NekoView.h"
 
-@interface MyPanel : NSPanel
+@interface NekoPanel : NSPanel
 {
-	IBOutlet MyView *view;
+	NekoView *view;
 	
 	NSArray *stop, *jare, *mati, *kaki, *akubi, *sleep, *awake, *u_move, *d_move,
 	        *l_move, *r_move, *ul_move, *ur_move, *dl_move, *dr_move, *u_togi,
