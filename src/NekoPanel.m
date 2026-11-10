@@ -6,6 +6,9 @@
 #define NAP_MIN_STATE_COUNT 240		/* ~60s */
 #define IDLE_ROUNDS 3			/* play/scratch rounds before yawning */
 
+/* The timer ticks every 0.125s (8 per second) */
+#define WAKE_DELAY_TICKS 16		/* ~2s: resting cat ignores the cursor this long */
+
 @implementation NekoPanel
 - (void)setStateTo:(id)theState
 {
@@ -224,6 +227,15 @@
 	
 	[self calcDxDyForX:x Y:y];
 	BOOL isNekoMoveStart = [self isNekoMoveStart];
+	if (isNekoMoveStart) {
+		if (awayTicks < 255) {
+			awayTicks++;
+		}
+	} else {
+		awayTicks = 0;
+	}
+	/* A resting (not napping) cat only reacts once the cursor has stayed away */
+	BOOL isRestOver = awayTicks >= WAKE_DELAY_TICKS;
 
 	if(nekoState != sleep) {
 		[view setImageTo:(NSImage*)[nekoState objectAtIndex:tickCount % [nekoState count]]];
@@ -234,7 +246,7 @@
 	[self advanceClock];
 	
     if(nekoState == stop) {
-		if (isNekoMoveStart) {
+		if (isRestOver) {
 			[self setStateTo:awake];
 			goto breakout;
 		}
@@ -254,7 +266,7 @@
 		[self setStateTo:jare];
 		//}
 	} else if(nekoState == jare) {
-		if (isNekoMoveStart) {
+		if (isRestOver) {
 			[self setStateTo:awake];
 			goto breakout;
 		}
@@ -263,7 +275,7 @@
 		}
 		[self setStateTo:mati];
 	} else if(nekoState == mati) {
-		if (isNekoMoveStart) {
+		if (isRestOver) {
 			[self setStateTo:awake];
 			goto breakout;
 		}
@@ -272,7 +284,7 @@
 		}
 		[self setStateTo:kaki];
 	} else if(nekoState == kaki) {
-		if (isNekoMoveStart && stateCount >= SCRATCH_MIN_STATE_COUNT) {
+		if (isRestOver && stateCount >= SCRATCH_MIN_STATE_COUNT) {
 			[self setStateTo:awake];
 			goto breakout;
 		}
@@ -285,7 +297,7 @@
 			[self setStateTo:akubi];
 		}
 	} else if(nekoState == akubi) {
-		if (isNekoMoveStart) {
+		if (isRestOver) {
 			[self setStateTo:awake];
 			goto breakout;
 		}

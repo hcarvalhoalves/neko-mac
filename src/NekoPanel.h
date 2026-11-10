@@ -12,7 +12,7 @@
 			*d_togi, *l_togi, *r_togi;
 	
 	id nekoState;
-	unsigned char tickCount, stateCount, idleRounds;
+	unsigned char tickCount, stateCount, idleRounds, awayTicks;
 	float moveDx, moveDy;
 	id myTimer;
 	
